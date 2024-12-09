@@ -11,7 +11,6 @@ $cart = new Cart($conn);
 $userId = $_SESSION['user_id'] ?? 0; // Replace with actual user session ID if available
 
 // Handle Add to Cart
-// Add to Cart Logic in index.php
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_to_cart') {
     $laptopId = $_POST['laptop_id'];
     $quantity = intval($_POST['quantity']);
@@ -103,6 +102,20 @@ $featuredLaptops = $conn->query("SELECT * FROM Laptops ORDER BY price DESC LIMIT
 </head>
 <body>
     <?php include "../includes/header.php"; ?>
+
+    <!-- Display Success Message -->
+    <?php if (isset($_SESSION['success_message'])) { ?>
+        <div class="alert success">
+            <?= htmlspecialchars($_SESSION['success_message']); ?>
+            <?php unset($_SESSION['success_message']); ?>
+        </div>
+    <?php } ?>
+    <?php if (isset($_SESSION['error_message'])) { ?>
+        <div class="alert error">
+            <?= htmlspecialchars($_SESSION['error_message']); ?>
+            <?php unset($_SESSION['error_message']); ?>
+        </div>
+    <?php } ?>
 
     <!-- Hero Section -->
     <div class="hero">
@@ -200,19 +213,25 @@ $featuredLaptops = $conn->query("SELECT * FROM Laptops ORDER BY price DESC LIMIT
                 <div class="product-grid">
                     <?php foreach ($laptops as $laptop) { ?>
                         <div class="product-card">
-                            <img src="../<?= $laptop['image_path'] ?>" alt="<?= $laptop['name'] ?>" class="product-image">
+                            <img src="../<?= htmlspecialchars($laptop['image_path']) ?>" alt="<?= htmlspecialchars($laptop['name']) ?>" class="product-image">
                             <div class="product-details">
-                                <h3 class="product-name"><?= $laptop['name'] ?></h3>
-                                <p class="product-brand">Brand: <?= $laptop['brand'] ?></p>
-                                <p class="product-price">$<?= $laptop['price'] ?></p>
+                                <h3 class="product-name"><?= htmlspecialchars($laptop['name']) ?></h3>
+                                <p class="product-brand">Brand: <?= htmlspecialchars($laptop['brand']) ?></p>
+                                <p class="product-price">$<?= htmlspecialchars($laptop['price']) ?></p>
                                 <div class="product-footer">
+                                    <!-- Quantity Controls -->
                                     <div class="quantity-controls">
                                         <button class="quantity-btn" onclick="updateQuantity(<?= $laptop['laptop_id'] ?>, -1)">-</button>
                                         <span id="quantity-<?= $laptop['laptop_id'] ?>">0</span>
                                         <button class="quantity-btn" onclick="updateQuantity(<?= $laptop['laptop_id'] ?>, 1)">+</button>
                                     </div>
-                                    <button class="add-to-cart-btn" id="cart-btn-<?= $laptop['laptop_id'] ?>" onclick="addToCart(<?= $laptop['laptop_id'] ?>)" disabled>Add to Cart</button>
-
+                                    <!-- Add to Cart Button -->
+                                    <form method="POST">
+                                        <input type="hidden" name="action" value="add_to_cart">
+                                        <input type="hidden" name="laptop_id" value="<?= $laptop['laptop_id'] ?>">
+                                        <input type="hidden" id="hidden-quantity-<?= $laptop['laptop_id'] ?>" name="quantity" value="0">
+                                        <button type="submit" class="add-to-cart-btn" id="cart-btn-<?= $laptop['laptop_id'] ?>" disabled>Add to Cart</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -256,18 +275,21 @@ $featuredLaptops = $conn->query("SELECT * FROM Laptops ORDER BY price DESC LIMIT
 // Update quantity dynamically
 function updateQuantity(laptopId, delta) {
     const quantityElement = document.getElementById(`quantity-${laptopId}`);
+    const hiddenQuantityElement = document.getElementById(`hidden-quantity-${laptopId}`);
     const cartButton = document.getElementById(`cart-btn-${laptopId}`);
-    const currentQuantity = parseInt(quantityElement.textContent);
+    let currentQuantity = parseInt(quantityElement.textContent);
 
     // Prevent quantity from going below 0
     if (currentQuantity === 0 && delta === -1) return;
 
     const newQuantity = currentQuantity + delta;
     quantityElement.textContent = newQuantity;
+    hiddenQuantityElement.value = newQuantity;
 
-    // Enable/disable the "Add to Cart" button based on quantity
+    // Enable/disable the "Add to Cart" button
     cartButton.disabled = newQuantity === 0;
 }
+
 
 
 // Add to cart with the specified quantity
