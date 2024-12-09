@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: login.php');
         exit();
     } catch (PDOException $e) {
-        if ($e->getCode() == 23000) { // Duplicate entry error
+        if ($e->getCode() == 23000) {
             $_SESSION['error_message'] = "Username or email already exists.";
         } else {
             $_SESSION['error_message'] = "Error: " . $e->getMessage();

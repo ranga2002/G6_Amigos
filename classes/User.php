@@ -38,7 +38,7 @@ class User {
     public function updateUser($userId, $username, $email, $password = null) {
         if ($password) {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-            $query = "UPDATE Users SET username = ?, email = ?, password_hash = ? WHERE id = ?";
+            $query = "UPDATE Users SET username = ?, email = ?, password_hash = ? WHERE user_id = ?";
             $stmt = $this->conn->prepare($query);
             return $stmt->execute([$username, $email, $hashedPassword, $userId]);
         } else {
