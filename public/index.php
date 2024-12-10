@@ -212,7 +212,7 @@ $featuredLaptops = $conn->query("SELECT * FROM Laptops ORDER BY price DESC LIMIT
                 <h2>All Laptops</h2>
                 <div class="product-grid">
                     <?php foreach ($laptops as $laptop) { ?>
-                        <div class="product-card">
+                        <div class="product-card" >
                             <img src="../<?= htmlspecialchars($laptop['image_path']) ?>" alt="<?= htmlspecialchars($laptop['name']) ?>" class="product-image">
                             <div class="product-details">
                                 <h3 class="product-name"><?= htmlspecialchars($laptop['name']) ?></h3>

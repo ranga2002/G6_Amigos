@@ -35,8 +35,8 @@ $subtotal = 0;
 foreach ($cartItems as $item) {
     $subtotal += $item['price'] * $item['quantity'];
 }
-$discount = 50; // Example discount, replace with dynamic value if needed
-$taxRate = 5; // Example tax rate
+$discount = 50; 
+$taxRate = 5;
 $tax = ($subtotal - $discount) * ($taxRate / 100);
 $total = $subtotal - $discount + $tax;
 
